@@ -1,24 +1,21 @@
- version: 2
- jobs:
-   build:
-     docker:
-       - image: circleci/ruby:2.4.1
-     steps:
-       - checkout
-       - run: echo "A first hello"
+version: 2.1
 
-# version: 2.1 # Use version 2.1 to enable orb usage.
+orbs:
+  python: circleci/python@0.2.1
 
-# orbs:
-#   win: circleci/windows@2.2.0 # The Windows orb give you everything you need to start using the Windows executor.
+jobs:
+  build-and-test:
+    executor: python/default
+    steps:
+      - checkout
+      - python/load-cache
+      - python/install-deps
+      - python/save-cache
+      - run:
+          command: ./manage.py test
+          name: Test
 
-# jobs:
-#   build: # name of your job
-#     executor:
-#       name: win/default # executor type
-#       size: "medium" # resource class, can be "medium", "large", "xlarge", "2xlarge", defaults to "medium" if not specified
-
-#     steps:
-#       # Commands are run in a Windows virtual machine environment
-#       - checkout
-#       - run: Write-Host 'Hello, Windows'
+workflows:
+  main:
+    jobs:
+      - build-and-test
